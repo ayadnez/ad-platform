@@ -24,6 +24,7 @@ const register = async (req, res) => {
     const newUser = new User({
       userName,
       password: hashedPassword,
+      role : 'user'
     });
 
     await newUser.save();
@@ -56,7 +57,8 @@ const login = async (req, res) => {
     // generate a jwt token 
 
     const payload = {
-      id : user._id
+      id : user._id,
+      role : user.role
     }
     const token = jwt.sign(payload,process.env.SECRETKEY,{
       expiresIn : "6h",
@@ -260,11 +262,27 @@ const handleFileUpdate = (ad, file) => {
   
 }
 
+const getAllAds = async (req,res) => {
+     try {
+          const ads = await Ad.find();
+
+          if(!ads.length){
+            res.status(404).json({message:"no ads found"})
+          }
+
+          res.status(200).json(ads)
+     } catch(error) {
+      console.log("error while fetching ads",error)
+      res.status(500).json({message :"error fetching ads",Error : error})
+     }
+}
+
 
 
 module.exports = {
   register,
   login,
   upload,
-  updateAd
+  updateAd,
+  getAllAds
 };

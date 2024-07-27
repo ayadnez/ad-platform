@@ -1,14 +1,17 @@
 const router = require('express').Router();
-const {register,login , upload,updateAd} = require('../controllers/user.controller');
+const {register,login , upload,updateAd,getAllAds} = require('../controllers/user.controller');
 const multer = require('multer');
 const uploadMiddleware = multer({ dest: 'uploads/' });
-const authUser = require('./auth')
+const {authUser} = require('./auth')
 
-
+// public routes
 router.post('/register',register);
 router.post('/login',login);
-router.post('/upload',uploadMiddleware.single('file'),upload)
-router.put('/ads/:id',uploadMiddleware.single('file'),updateAd)
+
+// authenticated  user routes
+router.post('/upload',authUser,uploadMiddleware.single('file'),upload)
+router.put('/ads/:id',authUser,uploadMiddleware.single('file'),updateAd)
+router.get('/ads',authUser,getAllAds)
 
 router.get('/hello',function(req,res){
     res.json({message:"hello from digital domi"})
