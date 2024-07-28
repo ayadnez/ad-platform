@@ -60,14 +60,52 @@ const login = async (req, res) => {
       id : user._id,
       role : user.role
     }
-    const token = jwt.sign(payload,process.env.SECRETKEY,{
-      expiresIn : "6h",
+    const accessToken = jwt.sign(payload,process.env.JWT_SECRETKEY,{  expiresIn : "6h",});
+    const refreshToken = jwt.sign(payload,process.env.REFRESH_KEY,{expiresIn:'7d'});
+
+    res.cookie('refreshToken',refreshToken,{
+      httpOnly:true,
+      secure : process.env.NODE_ENV === 'test',
+      sameSite :'strict',
+      maxAge :7*24*60*60*1000 // 7 days
     });
 
-    res.status(200).json({token})
+    res.status(200).json({accessToken});
   }catch(error){
+    console.log("error : ",error)
     res.status(500).json({message:"error while logging in"})
   }
+}
+
+const logout = async(req, res) => {
+  
+
+    //const accessToken = req.headers.authorization?.split(" ")[1] ?? null;
+
+    const { id } = req.user;
+
+    try {
+      const user = await User.findById(id);
+  
+      if (user) {
+        await user.save();
+      }
+  
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'test',
+        sameSite: 'Strict'
+      });
+  
+      res.status(200).json({ message: 'Logged out successfully' });
+
+    } catch (error) {
+
+      console.error('Error in logout controller:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  
+  
 }
 
 
@@ -284,5 +322,6 @@ module.exports = {
   login,
   upload,
   updateAd,
-  getAllAds
+  getAllAds,
+  logout
 };

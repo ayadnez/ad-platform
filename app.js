@@ -3,7 +3,8 @@ const express = require('express')
 const cors = require('cors');
 const userRoutes = require('./routes/user.route')
 const adminRoutes = require('./routes/admin.route')
-const Database = require('./config/database')
+const Database = require('./config/database');
+const cookieParser = require('cookie-parser');
 
 const corsOptions = {
   origin: '*',
@@ -13,6 +14,7 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 
 

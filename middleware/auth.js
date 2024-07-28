@@ -13,8 +13,11 @@ function authUser(req,res, next) {
 
     // check if the auth-token is valid 
 
-    jwt.verify(token,process.env.SECRETKEY,async (err,user) => {
+    jwt.verify(token,process.env.JWT_SECRETKEY,async (err,user) => {
         if(err) return res.status(403).json({message:"invalid token"});
+        
+      // to check what is inside user which jwt.verify returns
+        console.log(user)
 
         req.user = user;
         next();
